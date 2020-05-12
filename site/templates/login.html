@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Регистрация</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for( 'static', filename='login.css')}}">
+</head>
+<body>
+    <div class="main">
+        <h1>Регистрация</h1>
+    <form action="" method="post" novalidate>
+        <div class="f">
+            {{ form.mail.label }}
+            {{ form.mail }}
+            {% for error in form.mail.errors %}
+            <ul>
+                {{ error }}
+            {% endfor %}
+                <div class="m">{{ message }}</div>
+            </ul>
+        </div>
+        <div class="f">
+            {{ form.csrf_token }}
+            {{ form.name.label }}
+            {{ form.name }}
+            {% for error in form.name.errors %}
+            <ul>
+                {{ error }}
+            {% endfor %}
+            </ul>
+        </div>
+
+        <div class="f">
+            {{ form.surname.label }}
+            {{ form.surname }}
+            {% for error in form.surname.errors %}
+            <ul>
+                {{ error }}
+            {% endfor %}
+            </ul>
+        </div>
+
+        <div class="f">
+            {{ form.password.label }}
+            {{ form.password }}
+            {% for error in form.password.errors %}
+            <ul>
+                {{ error }}
+            {% endfor %}
+            </ul>
+        </div>
+
+        <duv class="f">
+            {{ form.remember_me.label }}
+            {{ form.remember_me(class="custom-checkbox") }}
+            {% for error in form.remember_me.errors %}
+            <ul>
+                {{ error }}
+            {% endfor %}
+            </ul>
+        </duv>
+        {{ form.submit_res(class="c-button", value="Зарегистрироваться") }}
+        <p class="q">Уже зарегистрировались?</p>
+        {{ form.submit_sign(class="c-button", value="Войдите") }}
+    </form>
+    </div>
+</body>
+</html>
