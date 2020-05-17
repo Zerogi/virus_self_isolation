@@ -50,6 +50,15 @@ class CheckEmailForm(FlaskForm):
     submit_code = SubmitField('Подтвердить')
 
 
+class SignIn(FlaskForm):
+    mail = StringField('Почта',
+                       validators=[InputRequired("Необходимо ввести email")])
+    password = PasswordField('Пароль',
+                             validators=[InputRequired("Необходимо ввести пароль"),
+                                         Length(min=9, message='Пароль должен содержать больше 8 символов')])
+    submit_sign = SubmitField('Вход')
+
+
 users_codes = {}
 
 
@@ -105,37 +114,55 @@ def login():
 
             return redirect(url_for('.check', user=user.id))
 
-        elif form.submit_sign.data:
-            pass
+    if form.submit_sign.data:
+        return redirect('/signin')
     return render_template('login.html', form=form)
 
 
 @app.route('/check', methods=['GET', 'POST'])
 def check():
     user_id = request.args['user']
+    print(user_id)
     user = load_user(user_id)
 
     form = CheckEmailForm()
     print(user.name)
-    if form.validate_on_submit():
-        if form.submit_code.data:
-            if form.submit_code.data == users_codes[user.id]:
-                print(123)
-            return user.name
+    if form.submit_code.data:
+        print(users_codes[user.id])
+        if form.code.data != users_codes[user.id]:
+            return render_template('/check.html', form=form, message='Неверный код')
+        login_user(user, remember=True)
+        return redirect('/index')
     print(user.id)
     return render_template('/check.html', form=form)
         # print(current_user.get_id())
     #return render_template('/login')
 
 
-@app.route('/sign_in', methods=['GET', 'POST'])
-def sign_in():
-    pass
+@app.route('/signin', methods=['GET', 'POST'])
+def signin():
+    form = SignIn()
+    if form.submit_sign.data:
+        session = db_session.create_session()
+        user = session.query(User).filter(User.email == form.mail.data).first()
+        if user and user.check_password(form.password.data):
+            login_user(user, remember=True)
+            return redirect('/')
+        return render_template('sign_in.html',
+                               message="Неправильный логин или пароль",
+                               form=form)
+    return render_template('sign_in.html', form=form)
 
 
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/index', methods=['GET', 'POST'])
+def index():
+    return str(current_user.get_id())
 
+
+@app.route('/sign_in', methods=['GET', 'POST'])
+def sign_in():
+    pass
 
 def get_code():
     nums = [str(n) for n in range(10)]
